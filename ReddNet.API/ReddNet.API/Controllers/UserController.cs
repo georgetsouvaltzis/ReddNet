@@ -1,5 +1,7 @@
-﻿namespace ReddNet.API.Controllers;
+﻿using Microsoft.AspNetCore.Mvc;
 
-public class UserController
+namespace ReddNet.API.Controllers;
+
+public class UserController : ControllerBase
 {
 }

@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using ReddNet.Core.Services.Abstract;
+using ReddNet.Core.Services.Concrete;
 using ReddNet.Domain;
 using ReddNet.Infrastructure;
+using ReddNet.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,8 +15,19 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Identity related
 builder.Services.AddDbContext<ReddNetDbContext>(options => options.UseInMemoryDatabase("ReddNetDb"));
 builder.Services.AddIdentityCore<User>().AddRoles<IdentityRole>();
+
+
+// Repository related
+builder.Services.AddScoped<IRepositoryAsync<Comment>, CommentRepository>();
+builder.Services.AddScoped<IRepositoryAsync<Post>, PostRepository>();
+builder.Services.AddScoped<IRepositoryAsync<Community>, CommunityRepository>();
+
+
+// Services related
+builder.Services.AddScoped<ICommunityService, CommunityService>();
 
 var app = builder.Build();
 
