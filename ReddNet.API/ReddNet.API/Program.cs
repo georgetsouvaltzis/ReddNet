@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ReddNet.Core.Services.Abstract;
 using ReddNet.Core.Services.Concrete;
@@ -27,6 +28,7 @@ builder.Services.AddScoped<IRepositoryAsync<Community>, CommunityRepository>();
 
 // Services related
 builder.Services.AddScoped<ICommunityService, CommunityService>();
+builder.Services.AddScoped<IPostService, PostService>();
 
 var app = builder.Build();
 SeedDatabase(app);
@@ -55,13 +57,30 @@ void SeedDatabase(WebApplication app)
     if (service.Communities.Any())
         return;
 
+    var communityGuid = Guid.NewGuid();
     service.Communities.AddRange(new[]
     {
         new Community
         {
+            Id = communityGuid,
             Name = ".NET Developers Community",
+            Posts = new List<Post>
+            {
+                new()
+                {
+                    Title = "Migration to .NET 6",
+                    Content = "This is a demo tutorial representing on how to migrate from .NET Core to .NET 6. Follow the steps!",
+                },
+                new()
+                {
+                    Title = "How to add Entity Framework as NuGet package.",
+                    Content = "For more tutorial please follow the link : https://example.com",
+                }
+            }
         }
     });
 
     service.SaveChanges();
+
+    
 }

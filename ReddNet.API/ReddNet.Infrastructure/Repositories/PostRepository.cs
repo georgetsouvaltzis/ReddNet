@@ -1,12 +1,20 @@
-﻿using ReddNet.Domain;
+﻿using Microsoft.EntityFrameworkCore;
+using ReddNet.Domain;
 
 namespace ReddNet.Infrastructure.Repositories;
 
 public class PostRepository : IRepositoryAsync<Post>
 {
-    public Task<Post> AddAsync(Post entity)
+    private readonly ReddNetDbContext _dbContext;
+    public PostRepository(ReddNetDbContext dbContext)
     {
-        throw new NotImplementedException();
+        _dbContext = dbContext;
+    }
+    public async Task<Post> AddAsync(Post entity)
+    {
+        await _dbContext.AddAsync(entity);
+        await _dbContext.SaveChangesAsync();
+        return entity;
     }
 
     public Task DeleteAsync(Guid id)
@@ -14,14 +22,14 @@ public class PostRepository : IRepositoryAsync<Post>
         throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<Post>> GetAllAsync()
+    public async Task<IEnumerable<Post>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return await _dbContext.Posts.ToListAsync();
     }
 
-    public Task<Post> GetByIdAsync(Guid id)
+    public async Task<Post> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        return await _dbContext.Posts.SingleAsync(x => x.Id == id);
     }
 
     public Task<Post> UpdateAsync(Post entity)
