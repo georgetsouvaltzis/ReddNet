@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ReddNet.Core.Services.Abstract;
 using ReddNet.Core.Services.Concrete;
@@ -70,11 +69,27 @@ void SeedDatabase(WebApplication app)
                 {
                     Title = "Migration to .NET 6",
                     Content = "This is a demo tutorial representing on how to migrate from .NET Core to .NET 6. Follow the steps!",
+                    CommunityId = communityGuid,
+                    Comments = new List<Comment>
+                    {
+                        new Comment
+                        {
+                            Content = "After hours of trying, I have failed to migrate successfully. Is there anyone that could help me with it?",
+                        }
+                    }
                 },
                 new()
                 {
                     Title = "How to add Entity Framework as NuGet package.",
                     Content = "For more tutorial please follow the link : https://example.com",
+                    CommunityId = communityGuid,
+                    Comments = new List<Comment>
+                    {
+                        new Comment
+                        {
+                            Content = "by following your tutorials, I was able to successfully use EF!",
+                        }
+                    }
                 }
             }
         }
