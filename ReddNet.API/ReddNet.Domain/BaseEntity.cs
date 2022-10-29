@@ -8,7 +8,8 @@ public abstract class BaseEntity
         Id = Guid.NewGuid();
     }
 
-    public Guid Id { get; }
+    //[Key]
+    public Guid Id { get; set; }
 
     //public DateTime CreatedAt { get; }
     //public DateTime UpdatedAt { get; set; }

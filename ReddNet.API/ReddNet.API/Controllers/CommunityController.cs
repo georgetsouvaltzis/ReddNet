@@ -13,9 +13,9 @@ public class CommunityController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetCommunities()
+    public async Task<IActionResult> GetCommunities()
     {
-        return Ok();
+        return Ok(await _communityService.GetAll());
     }
 
     [HttpGet("{id:guid}")]

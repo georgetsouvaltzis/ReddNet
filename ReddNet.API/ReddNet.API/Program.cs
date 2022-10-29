@@ -17,8 +17,7 @@ builder.Services.AddSwaggerGen();
 
 // Identity related
 builder.Services.AddDbContext<ReddNetDbContext>(options => options.UseInMemoryDatabase("ReddNetDb"));
-builder.Services.AddIdentityCore<User>().AddRoles<IdentityRole>();
-
+builder.Services.AddIdentityCore<User>().AddRoles<IdentityRole>().AddEntityFrameworkStores<ReddNetDbContext>();
 
 // Repository related
 builder.Services.AddScoped<IRepositoryAsync<Comment>, CommentRepository>();
@@ -30,6 +29,7 @@ builder.Services.AddScoped<IRepositoryAsync<Community>, CommunityRepository>();
 builder.Services.AddScoped<ICommunityService, CommunityService>();
 
 var app = builder.Build();
+SeedDatabase(app);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -45,3 +45,23 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+void SeedDatabase(WebApplication app)
+{
+    using var scope = app.Services.CreateScope();
+    var sp = scope.ServiceProvider;
+    var service = sp.GetRequiredService<ReddNetDbContext>();
+
+    if (service.Communities.Any())
+        return;
+
+    service.Communities.AddRange(new[]
+    {
+        new Community
+        {
+            Name = ".NET Developers Community",
+        }
+    });
+
+    service.SaveChanges();
+}

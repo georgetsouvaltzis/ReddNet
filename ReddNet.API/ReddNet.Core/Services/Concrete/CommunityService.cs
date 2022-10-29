@@ -12,6 +12,7 @@ public class CommunityService : ICommunityService
     {
         _communityRepository = communityRepository;
     }
+
     public async Task<CommunityModel> GetById(Guid id)
     {
         var existingEntity = await _communityRepository.GetByIdAsync(id);
@@ -21,5 +22,16 @@ public class CommunityService : ICommunityService
             Id = existingEntity.Id,
             Name = existingEntity.Name
         };
+    }
+    
+    public async Task<IEnumerable<CommunityModel>> GetAll()
+    {
+        var existingCommunities = await _communityRepository.GetAllAsync();
+
+        return existingCommunities.Select(x => new CommunityModel
+        {
+            Id = x.Id,
+            Name = x.Name,
+        });
     }
 }
