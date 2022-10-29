@@ -4,14 +4,21 @@ namespace ReddNet.Infrastructure.Repositories;
 
 public class CommentRepository : IRepositoryAsync<Comment>
 {
-    public Task<Comment> AddAsync(Comment entity)
+    private readonly ReddNetDbContext _dbContext;
+    public CommentRepository(ReddNetDbContext dbContext)
     {
-        throw new NotImplementedException();
+        _dbContext = dbContext;
+    }
+    public async Task<Comment> AddAsync(Comment entity)
+    {
+        await _dbContext.Comments.AddAsync(entity);
+        return entity;
     }
 
-    public Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(Guid id)
     {
-        throw new NotImplementedException();
+        _dbContext.Comments.Remove(new Comment { Id = id });
+        await _dbContext.SaveChangesAsync();
     }
 
     public Task<IEnumerable<Comment>> GetAllAsync()

@@ -29,7 +29,7 @@ public class PostRepository : IRepositoryAsync<Post>
 
     public async Task<Post> GetByIdAsync(Guid id)
     {
-        return await _dbContext.Posts.SingleAsync(x => x.Id == id);
+        return await _dbContext.Posts.SingleOrDefaultAsync(x => x.Id == id);
     }
 
     public Task<Post> UpdateAsync(Post entity)
