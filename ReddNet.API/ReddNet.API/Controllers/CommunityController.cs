@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ReddNet.Core.Models;
 using ReddNet.Core.Services.Abstract;
 
 namespace ReddNet.API.Controllers;
@@ -23,5 +24,20 @@ public class CommunityController : ControllerBase
     {
         var communityModel = await _communityService.GetById(id);
         return Ok(communityModel);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateCommunity([FromBody]CreateCommunityModel createCommunityModel)
+    {
+        var createdModel = await _communityService.Add(createCommunityModel);
+
+        return Ok(createdModel);
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteCommunity(Guid id)
+    {
+        await _communityService.Delete(id);
+        return Ok();
     }
 }

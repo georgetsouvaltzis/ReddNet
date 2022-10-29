@@ -34,4 +34,16 @@ public class CommunityService : ICommunityService
             Name = x.Name,
         });
     }
+
+    public async Task<CreateCommunityModel> Add(CreateCommunityModel createdCommunityModel)
+    {
+        var createdCommunity = new Community { Name = createdCommunityModel.Name };
+        await _communityRepository.AddAsync(createdCommunity);
+        return createdCommunityModel;
+    }
+
+    public async Task Delete(Guid id)
+    {
+        await _communityRepository.DeleteAsync(id);
+    }
 }

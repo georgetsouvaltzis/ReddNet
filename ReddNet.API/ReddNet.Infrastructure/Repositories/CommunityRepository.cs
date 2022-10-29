@@ -14,6 +14,7 @@ public class CommunityRepository : IRepositoryAsync<Community>
     public async Task<Community> AddAsync(Community entity)
     {
         await _dbContext.Communities.AddAsync(entity);
+        await _dbContext.SaveChangesAsync();
         return entity;
     }
 
