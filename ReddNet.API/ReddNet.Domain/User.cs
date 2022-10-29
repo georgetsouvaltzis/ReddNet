@@ -1,6 +1,8 @@
-﻿namespace ReddNet.Domain;
+﻿using Microsoft.AspNetCore.Identity;
 
-public class User
+namespace ReddNet.Domain;
+
+public class User : IdentityUser
 {
     public string Name { get; set; }
     public string LastName { get; set; }

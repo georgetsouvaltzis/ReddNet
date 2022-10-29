@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ReddNet.Infrastructure\ReddNet.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
