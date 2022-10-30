@@ -8,6 +8,17 @@ using ReddNet.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//TODO:
+// Add Caching service (Redis? Memcache?)
+// Logger should be added and configured.
+// Ability to host it in Docker.
+// Exception Filters should be added.
+// Should add JWT
+// Possible IdentityServer?
+// Need to think wheter we continue supporting fully InMemoryDb or will move to any of the db.
+// Swagger configuration should be extended.
+// Add healthcheck
+
 // Add services to the container.
 
 builder.Services.AddControllers();
