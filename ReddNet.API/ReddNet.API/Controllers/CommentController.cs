@@ -35,9 +35,9 @@ public class CommentController : ControllerBase
         return Ok();
     }
 
-    [HttpPost]
-    public IActionResult VoteComment()
-    {
-        return Ok();
-    }
+    //[HttpPost]
+    //public IActionResult VoteComment(Guid commentId)
+    //{
+    //    return Ok();
+    //}
 }
