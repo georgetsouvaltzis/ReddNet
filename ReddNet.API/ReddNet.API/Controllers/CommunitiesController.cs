@@ -23,12 +23,14 @@ public class CommunitiesController : ControllerBase
     }
 
     [HttpGet]
+    // TODO: Everyone can retrieve Communities.
     public async Task<IActionResult> GetCommunities()
     {
         return Ok(await _communityService.GetAll());
     }
 
     [HttpGet("{id:guid}")]
+    //TODO: Anyone can retreive Community information by id.
     public async Task<IActionResult> GetCommunityById(Guid id)
     {
         var communityModel = await _communityService.GetById(id);
@@ -60,6 +62,7 @@ public class CommunitiesController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    //TODO: Delete community should be done only if user is eligible to delete(Being Admin).
     public async Task<IActionResult> DeleteCommunity(Guid id)
     {
         await _communityService.Delete(id);

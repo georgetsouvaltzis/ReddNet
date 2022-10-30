@@ -14,6 +14,7 @@ public class PostsController : ControllerBase
 	}
 
 	[HttpGet]
+	// TODO: Anyone can receive all the posts.
 	public async Task<IActionResult> GetAll()
 	{
 		return Ok(await _postService.GetAll());
@@ -21,12 +22,15 @@ public class PostsController : ControllerBase
 
 	[HttpGet]
 	[Route("{postId:guid}")]
+	// TODO: Anyone can receive Posts by id.
 	public async Task<IActionResult> GetById(Guid postId)
 	{
 		return Ok(await _postService.GetById(postId));
 	}
 
 	[HttpPost]
+	// TODO: Needs authentication.
+	// Anyone is able to create post.
 	public async Task<IActionResult> CreatePost([FromBody] CreatePostModel postModel)
 	{
 		return Ok(await _postService.Add(postModel));
@@ -34,6 +38,8 @@ public class PostsController : ControllerBase
 
 	[HttpDelete]
 	[Route("{postId:guid}")]
+	//TODO: Needs authentication
+	// Only Admin/Moderator can delete posts, or user whoever created it.
 	public async Task<IActionResult> DeletePost(Guid postId)
 	{
 		await _postService.Delete(postId);

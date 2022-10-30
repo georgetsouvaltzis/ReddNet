@@ -21,6 +21,8 @@ public class CommentsController : ControllerBase
     //}
 
     [HttpPost]
+    //TODO: can add only comment if they're authorized.
+    // Needs authentication. Anyone can add comment.
     public async Task<IActionResult> AddComment([FromBody] CreateCommentModel commentModel)
     {
         return Ok(await _commentService.Add(commentModel));
@@ -29,12 +31,19 @@ public class CommentsController : ControllerBase
 
     [HttpPost]
     [Route("{commentId:guid}")]
+    //TODO: should delete comment from the Post.
+    // Needs authentication.
+    // If they're admin/moderator they can remove any of the comments.
+    // If just a regular user, should remove their comment only.
     public async Task<IActionResult> DeleteComment(Guid commentId)
     {
         await _commentService.Delete(commentId);
         return Ok();
     }
 
+    //TODO: Needs authentication.
+    // Can upvote or downvote comment.
+    // If user has already voted, they can change the voting direction.
     //[HttpPost]
     //public IActionResult VoteComment(Guid commentId)
     //{
