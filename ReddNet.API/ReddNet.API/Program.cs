@@ -37,14 +37,6 @@ builder.Services.AddScoped<IPostService, PostService>();
 
 // Authentication related
 
-//builder.Services
-//    .AddAuthentication("jwt")
-//    .AddJwtBearer("jwt", options =>
-//    {
-//        options.Audience = "ReddNet.API";
-//        options.Authority = "ReddNet.API";
-//    });
-
 var app = builder.Build();
 SeedDatabase(app);
 

@@ -6,10 +6,10 @@ using ReddNet.Domain;
 namespace ReddNet.API.Controllers;
 
 [Route("[controller]")]
-public class RegistrationController : ControllerBase
+public class RegisterController : ControllerBase
 {
     private readonly UserManager<User> _userManager;
-    public RegistrationController(UserManager<User> userManager)
+    public RegisterController(UserManager<User> userManager)
     {
         _userManager = userManager;
     }
@@ -33,7 +33,7 @@ public class RegistrationController : ControllerBase
             Name = userModel.FirstName,
             LastName = userModel.LastName,
         };
-        var result = await _userManager.CreateAsync(newUser, userModel.Password);
+        _ = await _userManager.CreateAsync(newUser, userModel.Password);
 
         return Ok();
     }
