@@ -65,4 +65,30 @@ public class CommunitiesController : ControllerBase
         await _communityService.Delete(id);
         return Ok();
     }
+
+    [HttpPost]
+    [Route("{communityId:guid}/addmoderator")]
+    public async Task<IActionResult> AddModerator(Guid communityId, [FromBody] AddModeratorModel moderatorModel)
+    {
+        //TODO: If requester is not an admin of the current Community, he/she can't add.
+        var toBeAddedUser = await _userManager.FindByIdAsync(moderatorModel.UserId.ToString());
+        var existingCommunity = await _communityService.GetById(communityId);
+
+        if (existingCommunity == null)
+            throw new InvalidOperationException("Could not find associated community.");
+
+        if (toBeAddedUser == null)
+            throw new InvalidOperationException("Could not find user with specified ID.");
+
+        var roleTemplate = $"{nameof(Community)}/{existingCommunity.Id}/Moderator";
+        if (!await _userManager.IsInRoleAsync(toBeAddedUser, roleTemplate))
+        {
+            var createdRole = await _roleManager.CreateAsync(new IdentityRole
+            {
+                Name = roleTemplate
+            });
+            await _userManager.AddToRoleAsync(toBeAddedUser, roleTemplate);
+        }
+        return Ok("User Added successfully.");
+    }
 }
