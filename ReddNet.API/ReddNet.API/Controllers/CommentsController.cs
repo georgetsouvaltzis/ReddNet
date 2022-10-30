@@ -5,10 +5,10 @@ using ReddNet.Core.Services.Abstract;
 namespace ReddNet.API.Controllers;
 
 [Route("[controller]")]
-public class CommentController : ControllerBase
+public class CommentsController : ControllerBase
 {
     private readonly ICommentService _commentService;
-    public CommentController(ICommentService commentService)
+    public CommentsController(ICommentService commentService)
     {
         _commentService = commentService;
     }

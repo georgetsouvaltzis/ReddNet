@@ -23,7 +23,7 @@ public class CommunityService : ICommunityService
             Name = existingEntity.Name
         };
     }
-    
+
     public async Task<IEnumerable<CommunityModel>> GetAll()
     {
         var existingCommunities = await _communityRepository.GetAllAsync();
@@ -39,6 +39,7 @@ public class CommunityService : ICommunityService
     {
         var createdCommunity = new Community { Name = createdCommunityModel.Name };
         await _communityRepository.AddAsync(createdCommunity);
+        createdCommunityModel.CommunityId = createdCommunity.Id;
         return createdCommunityModel;
     }
 

@@ -6,12 +6,15 @@ using ReddNet.Domain;
 namespace ReddNet.API.Controllers;
 
 [Route("[controller]")]
-public class RegisterController : ControllerBase
+public class AuthController : ControllerBase
 {
     private readonly UserManager<User> _userManager;
-    public RegisterController(UserManager<User> userManager)
+    private readonly SignInManager<User> _signInManager;
+    public AuthController(UserManager<User> userManager,
+        SignInManager<User> signInManager)
     {
         _userManager = userManager;
+        _signInManager = signInManager;
     }
 
     [HttpPost]
@@ -33,7 +36,9 @@ public class RegisterController : ControllerBase
             Name = userModel.FirstName,
             LastName = userModel.LastName,
         };
-        _ = await _userManager.CreateAsync(newUser, userModel.Password);
+        var f = await _userManager.CreateAsync(newUser, userModel.Password);
+
+        await _signInManager.SignInAsync(newUser, false);
 
         return Ok();
     }

@@ -17,14 +17,14 @@ builder.Services.AddSwaggerGen();
 
 // Identity related
 builder.Services.AddDbContext<ReddNetDbContext>(options => options.UseInMemoryDatabase("ReddNetDb"));
-builder.Services.AddIdentityCore<User>(options =>
+builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequiredLength = 3;
     options.Password.RequireDigit = false;
     options.Password.RequireUppercase = false;
-    
-}).AddRoles<IdentityRole>().AddEntityFrameworkStores<ReddNetDbContext>();
+
+}).AddEntityFrameworkStores<ReddNetDbContext>();
 
 // Repository related
 builder.Services.AddScoped<IRepositoryAsync<Comment>, CommentRepository>();
@@ -62,7 +62,7 @@ void SeedDatabase(WebApplication app)
     using var scope = app.Services.CreateScope();
     var sp = scope.ServiceProvider;
     var service = sp.GetRequiredService<ReddNetDbContext>();
-
+    
     if (service.Communities.Any())
         return;
 
@@ -107,5 +107,5 @@ void SeedDatabase(WebApplication app)
 
     service.SaveChanges();
 
-    
+
 }

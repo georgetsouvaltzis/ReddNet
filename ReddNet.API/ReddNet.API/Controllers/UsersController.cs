@@ -3,6 +3,6 @@
 namespace ReddNet.API.Controllers;
 
 [Route("[controller]")]
-public class UserController : ControllerBase
+public class UsersController : ControllerBase
 {
 }

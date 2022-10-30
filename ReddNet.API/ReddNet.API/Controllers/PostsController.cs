@@ -5,10 +5,10 @@ using ReddNet.Core.Services.Abstract;
 namespace ReddNet.API.Controllers;
 
 [Route("[controller]")]
-public class PostController : ControllerBase
+public class PostsController : ControllerBase
 {
 	private readonly IPostService _postService;
-	public PostController(IPostService postService)
+	public PostsController(IPostService postService)
 	{
 		_postService = postService;
 	}
