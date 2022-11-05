@@ -1,10 +1,19 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using ReddNet.API.Authorization.Handlers;
+//using ReddNet.API.Authorization.Requiremenets;
 using ReddNet.Core.Services.Abstract;
 using ReddNet.Core.Services.Concrete;
 using ReddNet.Domain;
 using ReddNet.Infrastructure;
 using ReddNet.Infrastructure.Repositories;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +33,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+
+});
 
 // Identity related
 builder.Services.AddDbContext<ReddNetDbContext>(options => options.UseInMemoryDatabase("ReddNetDb"));
@@ -37,6 +49,7 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 
 }).AddEntityFrameworkStores<ReddNetDbContext>().AddDefaultTokenProviders();
 
+
 // Repository related
 builder.Services.AddScoped<IRepositoryAsync<Comment>, CommentRepository>();
 builder.Services.AddScoped<IRepositoryAsync<Post>, PostRepository>();
@@ -47,6 +60,34 @@ builder.Services.AddScoped<ICommunityService, CommunityService>();
 builder.Services.AddScoped<IPostService, PostService>();
 
 // Authentication related
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidAudience = "http://localhost:5031",
+            ValidIssuer = "http://localhost:5031",
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Super Secret Key"))
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("IsEligibleDelete", policy =>
+    {
+        policy.Requirements.Add(new ASDFRequirement());
+    });
+    //options.AddPolicy("IsEligibleDelete", policy => policy.Requirements.Add(new IsEligibleForCommunityDeleteRequirement()));
+});
+
+builder.Services.AddScoped<IAuthorizationHandler, ASDFHandler>();
+
+//builder.Services.AddSingleton<IAuthorizationHandler, ASDFHandler>();
+
 
 var app = builder.Build();
 SeedDatabase(app);
@@ -57,8 +98,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
@@ -73,7 +112,7 @@ void SeedDatabase(WebApplication app)
     using var scope = app.Services.CreateScope();
     var sp = scope.ServiceProvider;
     var service = sp.GetRequiredService<ReddNetDbContext>();
-    
+
     if (service.Communities.Any())
         return;
 
