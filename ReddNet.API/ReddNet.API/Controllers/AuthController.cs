@@ -36,7 +36,7 @@ public class AuthController : ControllerBase
             Name = userModel.FirstName,
             LastName = userModel.LastName,
         };
-        var f = await _userManager.CreateAsync(newUser, userModel.Password);
+        var _ = await _userManager.CreateAsync(newUser, userModel.Password);
 
         await _signInManager.SignInAsync(newUser, false);
 

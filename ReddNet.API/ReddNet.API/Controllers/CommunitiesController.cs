@@ -48,7 +48,7 @@ public class CommunitiesController : ControllerBase
         var createdModel = await _communityService.Add(createCommunityModel);
 
         var communityRoleTemplate = $"{nameof(Community)}/{createdModel.CommunityId}/Admin";
-        
+
         if (!await _userManager.IsInRoleAsync(currentUser, communityRoleTemplate))
         {
             var createdRole = await _roleManager.CreateAsync(new IdentityRole
@@ -57,7 +57,7 @@ public class CommunitiesController : ControllerBase
             });
             await _userManager.AddToRoleAsync(currentUser, communityRoleTemplate);
         }
-        
+
         return Ok(createdModel);
     }
 
@@ -65,6 +65,16 @@ public class CommunitiesController : ControllerBase
     //TODO: Delete community should be done only if user is eligible to delete(Being Admin).
     public async Task<IActionResult> DeleteCommunity(Guid id)
     {
+        var currentUser = await _userManager.GetUserAsync(User);
+        if (currentUser == null)
+            return BadRequest();
+
+        var communityRole = $"{nameof(Community)}/{id}/Admin";
+
+        if (!await _userManager.IsInRoleAsync(currentUser, communityRole))
+        {
+            return BadRequest();
+        }
         await _communityService.Delete(id);
         return Ok();
     }
@@ -74,6 +84,7 @@ public class CommunitiesController : ControllerBase
     public async Task<IActionResult> AddModerator(Guid communityId, [FromBody] AddModeratorModel moderatorModel)
     {
         //TODO: If requester is not an admin of the current Community, he/she can't add.
+        var currentUser = await _userManager.GetUserAsync(User);
         var toBeAddedUser = await _userManager.FindByIdAsync(moderatorModel.UserId.ToString());
         var existingCommunity = await _communityService.GetById(communityId);
 
@@ -83,14 +94,21 @@ public class CommunitiesController : ControllerBase
         if (toBeAddedUser == null)
             throw new InvalidOperationException("Could not find user with specified ID.");
 
-        var roleTemplate = $"{nameof(Community)}/{existingCommunity.Id}/Moderator";
-        if (!await _userManager.IsInRoleAsync(toBeAddedUser, roleTemplate))
+        var communityRoleTemplate = $"{nameof(Community)}/{existingCommunity.Id}/Admin";
+        var moderatorRoleTemplate = $"{nameof(Community)}/{existingCommunity.Id}/Moderator";
+
+        if (!await _userManager.IsInRoleAsync(currentUser, communityRoleTemplate))
+        {
+            return BadRequest();
+        }
+
+        if (!await _userManager.IsInRoleAsync(toBeAddedUser, moderatorRoleTemplate))
         {
             var createdRole = await _roleManager.CreateAsync(new IdentityRole
             {
-                Name = roleTemplate
+                Name = moderatorRoleTemplate
             });
-            await _userManager.AddToRoleAsync(toBeAddedUser, roleTemplate);
+            await _userManager.AddToRoleAsync(toBeAddedUser, moderatorRoleTemplate);
         }
         return Ok("User Added successfully.");
     }

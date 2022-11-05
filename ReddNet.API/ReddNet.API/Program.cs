@@ -35,7 +35,7 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     options.Password.RequireDigit = false;
     options.Password.RequireUppercase = false;
 
-}).AddEntityFrameworkStores<ReddNetDbContext>();
+}).AddEntityFrameworkStores<ReddNetDbContext>().AddDefaultTokenProviders();
 
 // Repository related
 builder.Services.AddScoped<IRepositoryAsync<Comment>, CommentRepository>();

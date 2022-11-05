@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using ReddNet.Core.Models;
 using ReddNet.Core.Services.Abstract;
+using ReddNet.Domain;
 
 namespace ReddNet.API.Controllers;
 
@@ -8,9 +12,14 @@ namespace ReddNet.API.Controllers;
 public class PostsController : ControllerBase
 {
 	private readonly IPostService _postService;
-	public PostsController(IPostService postService)
+	private readonly UserManager<User> _userManager;
+	private readonly IAuthorizationService _authorizationService;
+	public PostsController(IPostService postService, UserManager<User> userManager,
+		IAuthorizationService authorizationService)
 	{
 		_postService = postService;
+		_userManager = userManager;
+		_authorizationService = authorizationService;
 	}
 
 	[HttpGet]
@@ -30,7 +39,7 @@ public class PostsController : ControllerBase
 
 	[HttpPost]
 	// TODO: Needs authentication.
-	// Anyone is able to create post.
+	// Any authenticated user is able to create post.
 	public async Task<IActionResult> CreatePost([FromBody] CreatePostModel postModel)
 	{
 		return Ok(await _postService.Add(postModel));
@@ -42,6 +51,24 @@ public class PostsController : ControllerBase
 	// Only Admin/Moderator can delete posts, or user whoever created it.
 	public async Task<IActionResult> DeletePost(Guid postId)
 	{
+		var currentPost = await _postService.GetById(postId);
+		
+		// Change to User.IsInRole()
+		var currentUser = await _userManager.GetUserAsync(User);
+        var communityRoleTemplate = $"{nameof(Community)}/{currentPost.PostId}/Admin";
+        var moderatorRoleTemplate = $"{nameof(Community)}/{currentPost.PostId}/Moderator";
+
+		if(!User.IsInRole(communityRoleTemplate) || !User.IsInRole(moderatorRoleTemplate))
+		{
+
+		}
+
+        var vasdf = await _authorizationService.AuthorizeAsync(User, currentPost, "IsEligibleForPostDelete");
+		if (!vasdf.Succeeded)
+		{
+			return Forbid();
+		}
+
 		await _postService.Delete(postId);
         return Ok();
 	}
