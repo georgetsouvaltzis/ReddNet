@@ -87,10 +87,15 @@ builder.Services.AddAuthorization(options =>
     {
         policy.Requirements.Add(new IsEligibleForCommunityDeleteRequirement());
     });
-    //options.AddPolicy("IsEligibleDelete", policy => policy.Requirements.Add(new IsEligibleForCommunityDeleteRequirement()));
+
+    options.AddPolicy("IsEligibleForCommunityModeratorAddition", policy =>
+    {
+        policy.Requirements.Add(new IsEligibleForCommunityModeratorAdditionRequirement());
+    });
 });
 
 builder.Services.AddScoped<IAuthorizationHandler, IsEligibleForCommunityDeleteHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, IsEligibleForCommunityModeratorAdditionHandler>();
 //builder.Services.AddScoped<IAuthorizationHandler, IsEligibleForCommunityDeleteHandler>();
 
 var app = builder.Build();

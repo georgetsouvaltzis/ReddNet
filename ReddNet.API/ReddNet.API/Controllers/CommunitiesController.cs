@@ -57,7 +57,7 @@ public class CommunitiesController : ControllerBase
     public async Task<IActionResult> DeleteCommunity(Guid id)
     {
         var resource = await _communityService.GetById(id);
-        
+
         var authorizationResult = await _authorizationService.AuthorizeAsync(User, resource, "IsEligibleForCommunityDelete");
 
         if (authorizationResult.Succeeded)
@@ -65,15 +65,14 @@ public class CommunitiesController : ControllerBase
             await _communityService.Delete(id, User.FindFirstValue("sub"));
             return Ok();
         }
-        return BadRequest();
+        return Forbid();
     }
 
     [HttpPost]
     [Route("{id:guid}/addmoderator")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> AddModerator(Guid communityId, [FromBody] AddModeratorModel moderatorModel)
     {
-        //TODO: If requester is not an admin of the current Community, he/she can't add.
-        var currentUser = await _userManager.GetUserAsync(User);
         var toBeAddedUser = await _userManager.FindByIdAsync(moderatorModel.UserId.ToString());
         var existingCommunity = await _communityService.GetById(communityId);
 
@@ -83,13 +82,14 @@ public class CommunitiesController : ControllerBase
         if (toBeAddedUser == null)
             throw new InvalidOperationException("Could not find user with specified ID.");
 
-        var communityRoleTemplate = $"{nameof(Community)}/{existingCommunity.Id}/Admin";
-        var moderatorRoleTemplate = $"{nameof(Community)}/{existingCommunity.Id}/Moderator";
+        var authorizationResult = await _authorizationService.AuthorizeAsync(User, existingCommunity, "IsEligibleForCommunityModeratorAddition");
 
-        if (!await _userManager.IsInRoleAsync(currentUser, communityRoleTemplate))
+        if (!authorizationResult.Succeeded)
         {
-            return BadRequest();
+            return Forbid();
         }
+
+        var moderatorRoleTemplate = $"{nameof(Community)}/{existingCommunity.Id}/Moderator";
 
         if (!await _userManager.IsInRoleAsync(toBeAddedUser, moderatorRoleTemplate))
         {
@@ -99,6 +99,7 @@ public class CommunitiesController : ControllerBase
             });
             await _userManager.AddToRoleAsync(toBeAddedUser, moderatorRoleTemplate);
         }
+
         return Ok("User Added successfully.");
     }
 }
