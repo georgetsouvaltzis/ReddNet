@@ -17,7 +17,6 @@ public class PostsController : ControllerBase
         IAuthorizationService authorizationService)
     {
         _postService = postService;
-        _userManager = userManager;
         _authorizationService = authorizationService;
     }
 
