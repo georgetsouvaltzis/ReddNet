@@ -1,7 +1,7 @@
-﻿//using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 
-//namespace ReddNet.API.Authorization.Requiremenets;
+namespace ReddNet.API.Authorization.Requiremenets;
 
-//public class IsEligibleForCommunityDeleteRequirement : IAuthorizationRequirement
-//{
-//}
+public class IsEligibleForCommunityDeleteRequirement : IAuthorizationRequirement
+{
+}

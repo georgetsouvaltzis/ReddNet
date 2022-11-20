@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using ReddNet.Core.Models;
 using ReddNet.Core.Services.Abstract;
 using ReddNet.Domain;
@@ -48,8 +47,15 @@ public class CommunityService : ICommunityService
         createdCommunityModel.CommunityId = createdCommunity.Id;
 
         var currentUser = await _userManager.FindByIdAsync(userId);
-        await AddToAdminRoleAsync(currentUser, createdCommunity.Id); 
+        await AddToAdminRoleAsync(currentUser, createdCommunity.Id);
         return createdCommunityModel;
+    }
+
+    public async Task Delete(Guid id, string userId)
+    {
+        var currentUser = await _userManager.FindByIdAsync(userId);
+        await RemoveCommunityRolesAsync(currentUser, id);
+        await _communityRepository.DeleteAsync(id);
     }
 
     private async Task AddToAdminRoleAsync(User currentUser, Guid communityId)
@@ -63,12 +69,27 @@ public class CommunityService : ICommunityService
                 Name = communityRoleTemplate,
             });
             await _userManager.AddToRoleAsync(currentUser, communityRoleTemplate);
-            //await _dbContext.SaveChangesAsync();
         }
     }
 
-    public async Task Delete(Guid id)
+    private async Task RemoveCommunityRolesAsync(User currentUser, Guid communityId)
     {
-        await _communityRepository.DeleteAsync(id);
+        var roles = new[]
+        {
+            $"{nameof(Community)}/{communityId}/Admin",
+            $"{nameof(Community)}/{communityId}/Moderator"
+        };
+
+        foreach (var role in roles)
+        {
+            var existingUsers = await _userManager.GetUsersInRoleAsync(role);
+            var existingRole = await _roleManager.FindByNameAsync(role);
+            foreach (var user in existingUsers)
+            {
+                var task = await _userManager.RemoveFromRoleAsync(user, role);
+            }
+            await _roleManager.DeleteAsync(existingRole);
+        }
+
     }
 }

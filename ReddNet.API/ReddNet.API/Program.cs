@@ -1,3 +1,4 @@
+using IdentityModel;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ReddNet.API.Authorization.Handlers;
+using ReddNet.API.Authorization.Requiremenets;
 //using ReddNet.API.Authorization.Requiremenets;
 using ReddNet.Core.Services.Abstract;
 using ReddNet.Core.Services.Concrete;
@@ -69,27 +71,27 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
+            RoleClaimType = JwtClaimTypes.Role,
             ValidateIssuerSigningKey = true,
             ValidAudience = "http://localhost:5031",
             ValidIssuer = "http://localhost:5031",
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Super Secret Key"))
         };
+        options.SaveToken = true;
     });
 
 builder.Services.AddAuthorization(options =>
 {
     JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
-    options.AddPolicy("IsEligibleDelete", policy =>
+    options.AddPolicy("IsEligibleForCommunityDelete", policy =>
     {
-        policy.Requirements.Add(new ASDFRequirement());
+        policy.Requirements.Add(new IsEligibleForCommunityDeleteRequirement());
     });
     //options.AddPolicy("IsEligibleDelete", policy => policy.Requirements.Add(new IsEligibleForCommunityDeleteRequirement()));
 });
 
-builder.Services.AddScoped<IAuthorizationHandler, ASDFHandler>();
-
-//builder.Services.AddSingleton<IAuthorizationHandler, ASDFHandler>();
-
+builder.Services.AddScoped<IAuthorizationHandler, IsEligibleForCommunityDeleteHandler>();
+//builder.Services.AddScoped<IAuthorizationHandler, IsEligibleForCommunityDeleteHandler>();
 
 var app = builder.Build();
 SeedDatabase(app);

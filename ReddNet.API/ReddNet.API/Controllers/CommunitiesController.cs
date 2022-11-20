@@ -2,11 +2,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.JsonWebTokens;
 using ReddNet.Core.Models;
 using ReddNet.Core.Services.Abstract;
 using ReddNet.Domain;
-using ReddNet.Infrastructure;
 using System.Security.Claims;
 
 namespace ReddNet.API.Controllers;
@@ -50,44 +48,28 @@ public class CommunitiesController : ControllerBase
     public async Task<IActionResult> CreateCommunity([FromBody] CreateCommunityModel createCommunityModel)
     {
         var createdModel = await _communityService.Add(createCommunityModel, User.FindFirstValue("sub"));
-        var communityRoleTemplate = $"{nameof(Community)}/{createdModel.CommunityId}/Admin";
-
-        var asdf = await _userManager.IsInRoleAsync(await _userManager.FindByIdAsync(User.FindFirstValue("sub")), communityRoleTemplate);
-
-        //var currentUser = await _userManager.FindByIdAsync(User.FindFirstValue("sub"));
-
-        //if (!await _userManager.IsInRoleAsync(currentUser, communityRoleTemplate))
-        //{
-        //    var createdRole = await _roleManager.CreateAsync(new IdentityRole
-        //    {
-        //        Name = communityRoleTemplate,
-        //    });
-        //    await _userManager.AddToRoleAsync(currentUser, communityRoleTemplate);
-        //    //await _dbContext.SaveChangesAsync();
-        //}
         return Ok(createdModel);
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     //TODO: Delete community should be done only if user is eligible to delete(Being Admin).
     public async Task<IActionResult> DeleteCommunity(Guid id)
     {
-        var currentUser = await _userManager.FindByIdAsync(User.FindFirstValue("sub"));
-        if (currentUser == null)
-            return BadRequest();
+        var resource = await _communityService.GetById(id);
+        
+        var authorizationResult = await _authorizationService.AuthorizeAsync(User, resource, "IsEligibleForCommunityDelete");
 
-        var communityRole = $"{nameof(Community)}/{id}/Admin";
-
-        if (!await _userManager.IsInRoleAsync(currentUser, communityRole))
+        if (authorizationResult.Succeeded)
         {
-            return BadRequest();
+            await _communityService.Delete(id, User.FindFirstValue("sub"));
+            return Ok();
         }
-        await _communityService.Delete(id);
-        return Ok();
+        return BadRequest();
     }
 
     [HttpPost]
-    [Route("{communityId:guid}/addmoderator")]
+    [Route("{id:guid}/addmoderator")]
     public async Task<IActionResult> AddModerator(Guid communityId, [FromBody] AddModeratorModel moderatorModel)
     {
         //TODO: If requester is not an admin of the current Community, he/she can't add.

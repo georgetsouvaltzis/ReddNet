@@ -94,7 +94,6 @@ public class AuthController : ControllerBase
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.Email, "email@yahoo.com"),
-                new Claim("IsEligibleForDelete", "true")
         };
 
     private SigningCredentials CreateSigningCredentials()
