@@ -65,6 +65,7 @@ public class AuthController : ControllerBase
             expiration
         );
 
+        
         var tokenHandler = new JwtSecurityTokenHandler();
 
         var tokenFinal = tokenHandler.WriteToken(token);

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using ReddNet.Core.Models;
+using System.Security.Claims;
 
 namespace ReddNet.API.Authorization.Handlers;
 

@@ -13,6 +13,7 @@ using ReddNet.Core.Services.Concrete;
 using ReddNet.Domain;
 using ReddNet.Infrastructure;
 using ReddNet.Infrastructure.Repositories;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -77,6 +78,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization(options =>
 {
+    JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
     options.AddPolicy("IsEligibleDelete", policy =>
     {
         policy.Requirements.Add(new ASDFRequirement());

@@ -1,8 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.JsonWebTokens;
 using ReddNet.Core.Models;
 using ReddNet.Core.Services.Abstract;
 using ReddNet.Domain;
+using ReddNet.Infrastructure;
+using System.Security.Claims;
 
 namespace ReddNet.API.Controllers;
 
@@ -12,14 +17,17 @@ public class CommunitiesController : ControllerBase
     private readonly ICommunityService _communityService;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly UserManager<User> _userManager;
+    private readonly IAuthorizationService _authorizationService;
 
     public CommunitiesController(ICommunityService communityService,
         RoleManager<IdentityRole> roleManager,
-        UserManager<User> userManager)
+        UserManager<User> userManager,
+        IAuthorizationService authorizationService)
     {
         _communityService = communityService;
         _roleManager = roleManager;
         _userManager = userManager;
+        _authorizationService = authorizationService;
     }
 
     [HttpGet]
@@ -38,26 +46,25 @@ public class CommunitiesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> CreateCommunity([FromBody] CreateCommunityModel createCommunityModel)
     {
-        var currentUser = await _userManager.GetUserAsync(User);
-
-        if (currentUser == null)
-            throw new InvalidOperationException("User is not logged in.");
-
-        var createdModel = await _communityService.Add(createCommunityModel);
-
+        var createdModel = await _communityService.Add(createCommunityModel, User.FindFirstValue("sub"));
         var communityRoleTemplate = $"{nameof(Community)}/{createdModel.CommunityId}/Admin";
 
-        if (!await _userManager.IsInRoleAsync(currentUser, communityRoleTemplate))
-        {
-            var createdRole = await _roleManager.CreateAsync(new IdentityRole
-            {
-                Name = communityRoleTemplate,
-            });
-            await _userManager.AddToRoleAsync(currentUser, communityRoleTemplate);
-        }
+        var asdf = await _userManager.IsInRoleAsync(await _userManager.FindByIdAsync(User.FindFirstValue("sub")), communityRoleTemplate);
 
+        //var currentUser = await _userManager.FindByIdAsync(User.FindFirstValue("sub"));
+
+        //if (!await _userManager.IsInRoleAsync(currentUser, communityRoleTemplate))
+        //{
+        //    var createdRole = await _roleManager.CreateAsync(new IdentityRole
+        //    {
+        //        Name = communityRoleTemplate,
+        //    });
+        //    await _userManager.AddToRoleAsync(currentUser, communityRoleTemplate);
+        //    //await _dbContext.SaveChangesAsync();
+        //}
         return Ok(createdModel);
     }
 
@@ -65,7 +72,7 @@ public class CommunitiesController : ControllerBase
     //TODO: Delete community should be done only if user is eligible to delete(Being Admin).
     public async Task<IActionResult> DeleteCommunity(Guid id)
     {
-        var currentUser = await _userManager.GetUserAsync(User);
+        var currentUser = await _userManager.FindByIdAsync(User.FindFirstValue("sub"));
         if (currentUser == null)
             return BadRequest();
 
