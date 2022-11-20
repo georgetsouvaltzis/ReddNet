@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.FileSystemGlobbing.Internal.PatternContexts;
-using ReddNet.API.Authorization.Requiremenets;
+using ReddNet.API.Authorization.Requirements;
 using ReddNet.Core.Models;
 using ReddNet.Domain;
 using System.Security.Claims;

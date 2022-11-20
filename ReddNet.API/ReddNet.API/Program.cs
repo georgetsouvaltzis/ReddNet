@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ReddNet.API.Authorization.Handlers;
-using ReddNet.API.Authorization.Requiremenets;
+using ReddNet.API.Authorization.Requirements;
 //using ReddNet.API.Authorization.Requiremenets;
 using ReddNet.Core.Services.Abstract;
 using ReddNet.Core.Services.Concrete;
