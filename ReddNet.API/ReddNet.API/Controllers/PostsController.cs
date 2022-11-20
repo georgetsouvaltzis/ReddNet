@@ -12,7 +12,6 @@ namespace ReddNet.API.Controllers;
 public class PostsController : ControllerBase
 {
     private readonly IPostService _postService;
-    private readonly UserManager<User> _userManager;
     private readonly IAuthorizationService _authorizationService;
     public PostsController(IPostService postService, UserManager<User> userManager,
         IAuthorizationService authorizationService)
@@ -56,7 +55,6 @@ public class PostsController : ControllerBase
         var currentPost = await _postService.GetById(postId);
 
         var authorizationResult = await _authorizationService.AuthorizeAsync(User, currentPost, "IsEligibleForPostDelete");
-
         if(authorizationResult.Succeeded)
         {
             await _postService.Delete(postId);

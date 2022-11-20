@@ -17,9 +17,10 @@ public class PostRepository : IRepositoryAsync<Post>
         return entity;
     }
 
-    public Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(Guid id)
     {
-        throw new NotImplementedException();
+        _dbContext.Comments.Remove(new Comment { Id = id });
+        await _dbContext.SaveChangesAsync();
     }
 
     public async Task<IEnumerable<Post>> GetAllAsync()
