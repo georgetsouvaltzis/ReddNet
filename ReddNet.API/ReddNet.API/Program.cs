@@ -9,7 +9,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ReddNet.API.Authorization.Handlers;
 using ReddNet.API.Authorization.Requirements;
-//using ReddNet.API.Authorization.Requiremenets;
 using ReddNet.Core.Services.Abstract;
 using ReddNet.Core.Services.Concrete;
 using ReddNet.Domain;
@@ -30,6 +29,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Need to think wheter we continue supporting fully InMemoryDb or will move to any of the db.
 // Swagger configuration should be extended.
 // Add healthcheck
+
+// Add Pagination
+// Add Support for querying
 
 // Add services to the container.
 
