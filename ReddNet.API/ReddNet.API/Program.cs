@@ -15,6 +15,7 @@ using ReddNet.Domain;
 using ReddNet.Infrastructure;
 using ReddNet.Infrastructure.Repositories;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Authentication.ExtendedProtection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -93,6 +94,11 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("IsEligibleForCommunityModeratorAddition", policy =>
     {
         policy.Requirements.Add(new IsEligibleForCommunityModeratorAdditionRequirement());
+    });
+
+    options.AddPolicy("IsEligibleForPostDelete", policy =>
+    {
+        policy.Requirements.Add();
     });
 });
 
